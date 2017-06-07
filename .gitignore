@@ -1,0 +1,6 @@
+.gradle/
+cmake-build-debug/
+build_win/
+build_raspi/
+build/
+.idea/

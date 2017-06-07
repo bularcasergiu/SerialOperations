@@ -1,0 +1,100 @@
+description = "SerialOperations"
+/* Relevant only for the agent*/
+apply plugin: "java"
+
+
+task createBuildDirectories{
+    description "Generates the Cmake work directories"
+    doFirst {
+        println "------------  Creating output directories -------"
+        mkdir("${projectDir}/build_win")    
+        mkdir("${projectDir}/build_raspi")   
+    }
+}
+/*Generate the windows binary makefiles */
+task generateWindowsBuild (type: Exec) {
+    description "Generates the agent windows build files"
+    dependsOn createBuildDirectories
+    def srcPath = "${projectDir}/src"
+    def toolchainPath = "${projectDir}/toolchains/toolchainfile_win32_x86.cmake"
+    def generatorType ="Unix Makefiles"
+    workingDir './build_win'        
+    commandLine 'cmake' ,"${srcPath}",'-DCMAKE_TOOLCHAIN_FILE='+"${toolchainPath}", '-G', "${generatorType}"
+    doFirst {
+        println "------------ Generation of makefiles for Windows started --------"
+        println "--->C++ sources set to ${srcPath}"
+        println "--->Toolchain set to ${toolchainPath}"
+    }
+    doLast {
+        println "----------- Generation of makefiles for Windows finished --------"
+    }
+}
+/*Generate the raspbian binary makefiles */
+task generateRaspiBuild (type: Exec) {
+    description "Generates the agent raspi build files"
+    dependsOn createBuildDirectories
+    def srcPath = "${projectDir}/src"
+    def toolchainPath = "${projectDir}/toolchains/toolchainfile_raspi_armv7.cmake"
+    def generatorType ="Unix Makefiles"
+    workingDir './build_raspi'      
+    commandLine 'cmake' ,"${srcPath}",'-DCMAKE_TOOLCHAIN_FILE='+"${toolchainPath}", '-G', "${generatorType}"    
+    doFirst {
+        println "------------ Generation of makefiles for Raspbian started --------"
+        println "--->C++ sources set to ${srcPath}"
+        println "--->Toolchain set to ${toolchainPath}"
+    }
+    doLast {
+        println "----------- Generation of makefiles for Raspbian finished --------"
+    }
+}
+
+/* Actual trigger for make */ 
+task buildRaspiBinary(type: Exec) {
+        description "Builds the raspi agent binary"
+        dependsOn generateRaspiBuild
+        workingDir './build_raspi'
+        commandLine 'make', 'all'
+        doFirst {
+            println "----------- Compilation of Raspbian binary started --------" 
+        }
+        doLast {
+            println "----------- Compilation of Raspbian binary finished --------" 
+        }
+}
+/* Actual trigger for make */ 
+task buildWinBinary(type: Exec) {
+    description "Builds the windows agent binary"
+    group = 'build'
+    dependsOn generateWindowsBuild
+    workingDir './build_win'
+    commandLine 'make', 'all'
+    doFirst {
+            println "----------- Compilation of Windows binary started --------" 
+    }   
+    doLast {
+            println "----------- Compilation of Wndows binary finished --------" 
+    }
+}
+
+/*artifacts {
+*    agent file: agentWin, type: 'zip' , name: 'sota-agent-win32' 
+*    agent file: agentRaspi, type: 'zip', name: 'sota-agent-raspi'
+*    agent file: agentimx6, type: 'zip', name: 'sota-agent-imx6'
+}*/
+/* Default tasks overwritten by our custom setup*/ 
+/* Cleans the build output*/
+clean {
+    doFirst{
+        delete "build_raspi"
+        delete "build_win"
+        delete "build_imx6"
+    }
+    doLast{ 
+        println "Cleaned up sota-agent build"
+    }
+}
+
+build {
+    dependsOn buildWinBinary
+    dependsOn buildRaspiBinary
+}

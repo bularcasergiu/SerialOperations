@@ -1,0 +1,17 @@
+message (STATUS "Generating for SmartAntenna")
+# set cmake internal stuff
+set(CMAKE_SYSTEM_NAME LINUX_IMX6)
+set(CMAKE_SYSTEM_VERSION 1)
+set(CMAKE_SYSTEM_PROCESSOR ARM)
+
+# set actual compiler and linker paths
+set(GCC_COMPILATION_FLAGS "-Wall -fsigned-char -march=armv7-a -mfpu=neon")
+set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COMPILATION_FLAGS}" )
+set(TOOLCHAIN_PREFIX "arm-linux-gnueabihf")
+set(CMAKE_TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}-")
+file(TO_CMAKE_PATH $ENV{IMX6_SDK} IMX6_TOOLCHAIN_PATH)
+
+set(CMAKE_C_COMPILER "${IMX6_TOOLCHAIN_PATH}/bin/${CMAKE_TOOLCHAIN_PREFIX}gcc.exe")
+set(CMAKE_CXX_COMPILER "${IMX6_TOOLCHAIN_PATH}/bin/${CMAKE_TOOLCHAIN_PREFIX}g++.exe")
+set(CMAKE_OBJCOPY "${IMX6_TOOLCHAIN_PATH}/bin/${CMAKE_TOOLCHAIN_PREFIX}objcopy.exe")
+set(CMAKE_LINKER "${IMX6_TOOLCHAIN_PATH}/bin/${CMAKE_TOOLCHAIN_PREFIX}ld.exe")
