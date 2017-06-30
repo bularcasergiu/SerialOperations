@@ -74,9 +74,8 @@ namespace{
 
 SerialLinux::SerialLinux(const char *portName):
     connected(false),
-    fd(0)
+    fd(open (portName, O_RDWR | O_NOCTTY ))
 {
-    fd = open (portName, O_RDWR | O_NOCTTY | O_SYNC);
     if (fd < 0)
     {
         connected = false;
@@ -102,12 +101,36 @@ bool SerialLinux::WriteData(const char *buffer, unsigned int nbChar)
 {
 
     //Try to write the buffer on the Serial port
-    if(write (fd, buffer, nbChar))
+//    if(write (fd, buffer, nbChar))
+//    {
+//        std::cout<<"call linux"<<std::endl;
+//        return true;
+//    }
+    unsigned char cmd[] = "red\r";
+//    int n_written = 0,
+//            spot = 0;
+//
+//    do {
+//        n_written = write( fd, &cmd[spot], 1 );
+//        spot += n_written;
+//    } while (cmd[spot-1] != '\r' && n_written > 0);
+    std::string str(buffer);
+    std::cout<<"call linux"<< str<<std::endl;
+    ssize_t writtenBytes = write( fd, buffer, sizeof(buffer));
+    tcdrain(fd);
+    std::cout<<"biti scrisi"<<writtenBytes<< str<<std::endl;
+    if (writtenBytes != sizeof(buffer))
     {
-        return true;
-    }
-    else
+        std::cout << "[AgentHmiEventsQueue::HmiObserver] WARNING write error: "
+                  << strerror(errno) << std::endl;
         return false;
+    }
+
+return true;
+
+
+//    else
+//        return false;
 }
 
 bool SerialLinux::IsConnected()

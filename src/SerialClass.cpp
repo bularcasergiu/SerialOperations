@@ -124,7 +124,6 @@ int Serial::ReadData(char *buffer, unsigned int nbChar)
 
 }
 
-
 bool Serial::WriteData(const char *buffer, unsigned int nbChar)
 {
     DWORD bytesSend;
@@ -140,6 +139,7 @@ bool Serial::WriteData(const char *buffer, unsigned int nbChar)
     else
         return true;
 }
+
 
 bool Serial::IsConnected()
 {

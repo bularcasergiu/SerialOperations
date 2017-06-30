@@ -87,7 +87,6 @@ clean {
     doFirst{
         delete "build_raspi"
         delete "build_win"
-        delete "build_imx6"
     }
     doLast{ 
         println "Cleaned up sota-agent build"
